@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLARKE // Enigma Decoded</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header style="justify-content: center;">
+        <div class="logo">CLARKE</div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Joan <span>Clarke</span></h1>
+                <p class="subtitle">The Enigma Codebreaker</p>
+                <p>
+                    Questa pagina vi introdurrà la storia di Joan Clarke e di come sia diventata una delle donne più celebri nel mondo dell'informatica.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <h2 style="text-align: center; margin-bottom: 2rem;">Video</h2>
+                <div class="media-box">
+                    <video controls style="width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);">
+                        <source src="ooo.mp4" type="video/mp4">
+                        Il tuo browser non supporta il tag video.
+                    </video>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <h3>Joan Clarke</h3>
+            <p>Mathematician • Cryptanalyst • Pioneer (1917-1996)</p>
+            <p style="margin-top: 1.5rem; font-size: 0.85rem;">
+                © 2026 | Progetto scolastico 3BIN
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                }
+            });
+        });
+
+        document.querySelectorAll('section').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
