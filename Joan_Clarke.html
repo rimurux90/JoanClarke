@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joan Clarke | The Enigma Cipher</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@100;400&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* --- CSS INTEGRATO --- */
+        :root {
+            --gold: #c5a059;
+            --gold-bright: #f1d299;
+            --dark: #05070a;
+            --darker: #020305;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(197, 160, 89, 0.2);
+            --text: #e0e0e0;
+            --font-serif: 'Cinzel', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* Effetto Codice di Sfondo */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--darker); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--darker);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+        .loader-cipher {
+            font-family: var(--font-mono);
+            color: var(--gold);
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* Typography */
+        h1, h2, h3 { font-family: var(--font-serif); font-weight: 700; color: var(--gold); }
+        .title-large { font-size: clamp(3rem, 10vw, 7rem); letter-spacing: 15px; margin: 0; }
+        .subtitle { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 5px; opacity: 0.7; }
+
+        /* Layout */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+        .section { padding: 150px 0; position: relative; }
+        .full-height { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+
+        /* Sezione Hero */
+        .hero {
+            background: radial-gradient(circle at center, rgba(197, 160, 89, 0.05) 0%, transparent 70%);
+        }
+        .hero-content { z-index: 10; }
+
+        /* Parallax Quote */
+        .parallax-quote {
+            background: linear-gradient(rgba(5,7,10,0.9), rgba(5,7,10,0.9)), 
+                        url('https://www.bletchleypark.org.uk/wp-content/uploads/2021/04/BP_Hut8_Exterior.jpg');
+            background-attachment: fixed;
+            background-size: cover;
+            padding: 200px 0;
+            text-align: center;
+        }
+        .parallax-quote blockquote {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-family: var(--font-serif);
+            font-style: italic;
+            color: var(--gold-bright);
+        }
+
+        /* Info Grid */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+        .image-frame {
+            position: relative;
+            border: 1px solid var(--gold);
+            padding: 20px;
+            transition: 0.5s;
+        }
+        .image-frame::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: -10px; width: 100%; height: 100%;
+            border: 1px solid var(--gold);
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Timeline Card */
+        .timeline { border-left: 2px solid var(--gold); padding-left: 50px; margin: 50px 0; }
+        .event { margin-bottom: 80px; position: relative; }
+        .event::before {
+            content: '';
+            position: absolute;
+            left: -59px; top: 10px;
+            width: 16px; height: 16px;
+            background: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--gold);
+        }
+        .event h3 { font-size: 1.8rem; margin-bottom: 10px; }
+        .year { font-family: var(--font-mono); color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+
+        /* Banburismus Card - Glassmorphism */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 60px;
+            border-radius: 4px;
+            margin-top: 50px;
+        }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 40px; }
+        .stat-item h4 { font-size: 3rem; font-family: var(--font-mono); margin-bottom: 5px; }
+
+        /* Footer */
+        footer {
+            padding: 100px 0;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            background: var(--darker);
+        }
+        .footer-logo { font-family: var(--font-serif); color: var(--gold); font-size: 2rem; margin-bottom: 20px; }
+
+        /* Responsività */
+        @media (max-width: 968px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 50px; text-align: center; }
+            .section { padding: 80px 0; }
+            .title-large { font-size: 4rem; }
+        }
+        .nav-controls {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        display: flex;
+        gap: 20px;
+        z-index: 1000;
+    }
+    .btn-gold {
+        background: linear-gradient(145deg, #d4af37, #a68a4a);
+        box-shadow: inset 2px 2px 5px rgba(255,255,255,0.3), inset -2px -2px 5px rgba(0,0,0,0.4);
+        border: none;
+        color: var(--darker);
+        padding: 15px 30px;
+        font-family: var(--font-mono);
+        font-weight: bold;
+        text-decoration: none;
+        transition: transform 0.3s, filter 0.3s;
+        cursor: pointer;
+    }
+    .btn-gold:hover { transform: translateY(-3px); filter: brightness(1.1); }
+    
+    .slide-in-right { animation: slideInRight 0.8s ease forwards; }
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    </style>
+    
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="loader">
+        <div class="loader-cipher" id="loader-text">01011001 01001111</div>
+        <p>DECRYPTING DOSSIER...</p>
+    </div>
+
+    <header class="section full-height hero" id="home">
+        <div class="container hero-content" data-aos="zoom-out" data-aos-duration="2000">
+            <span class="subtitle">Bletchley Park / Hut 8</span>
+            <h1 class="title-large">JOAN CLARKE</h1>
+            <p class="subtitle" style="font-size: 1rem; margin-top: 20px;">L'architetto della crittanalisi navale</p>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container grid-2">
+            <div class="image-frame" data-aos="fade-right">
+                <div style="background: #111; height: 400px; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-family: var(--font-mono); opacity: 0.2; font-size: 5rem;">ENIGMA</span>
+                </div>
+            </div>
+            <div class="text-content" data-aos="fade-left">
+                <h2>Una Mente Oltre i Limiti</h2>
+                <p>Joan Clarke non fu solo una collaboratrice di Alan Turing; fu la forza silenziosa e precisa che permise di dominare l'Atlantico. In un'epoca in cui le donne erano relegate a ruoli marginali, lei divenne la colonna portante dell'Hut 8, affrontando non solo i cifrari nazisti, ma anche i pregiudizi di un'intera nazione.</p>
+                <p style="margin-top: 20px;">La sua abilità nel <strong>Banburismus</strong> ridusse drasticamente il tempo di attacco ai messaggi della Marina Tedesca, salvando migliaia di vite alleate.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="parallax-quote">
+        <div class="container" data-aos="fade-up">
+            <blockquote>
+                "Cambridge le negò la laurea, ma la storia le ha consegnato l'eternità."
+            </blockquote>
+        </div>
+    </section>
+
+    <section class="section" id="timeline">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 100px;">La Linea del Tempo</h2>
+            
+            <div class="timeline">
+                <div class="event" data-aos="fade-up">
+                    <span class="year">1917 — 1939</span>
+                    <h3>Genesi di una Matematica</h3>
+                    <p>Nata a West Norwood, brilla al Newnham College di Cambridge. Ottiene un "Double First" in matematica, ma la politica di genere dell'epoca le nega il diploma ufficiale. Nonostante ciò, il suo talento non passa inosservato.</p>
+                </div>
+
+                <div class="event" data-aos="fade-up">
+                    <span class="year">1940 — 1944</span>
+                    <h3>Il Cuore di Bletchley Park</h3>
+                    <p>Reclutata da Gordon Welchman, si unisce all'Hut 8. Diventa vice-capo della sezione, l'unica donna a ricoprire un tale incarico di responsabilità tecnica. Riceve lo stipendio da "Linguista" solo come stratagemma burocratico per essere pagata di più, pur non parlando lingue straniere.</p>
+                </div>
+
+                <div class="event" data-aos="fade-up">
+                    <span class="year">1941</span>
+                    <h3>L'Anima Gemella di Turing</h3>
+                    <p>Il legame con Alan Turing fiorisce in una proposta di matrimonio. Sebbene il fidanzamento si sciolga poco dopo a causa della rivelazione della sua omosessualità, Joan rimane la sua confidente più stretta, un ponte tra la genialità isolata di lui e il mondo esterno.</p>
+                </div>
+
+                <div class="event" data-aos="fade-up">
+                    <span class="year">1947 — 1996</span>
+                    <h3>Oltre la Guerra</h3>
+                    <p>Premiata con l'MBE nel 1946, continua la carriera nel GCHQ. Si dedica con successo alla numismatica, diventando un'autorità riconosciuta e vincendo la medaglia d'oro Sanford Saltus nel 1986.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: var(--darker);">
+        <div class="container">
+            <div class="glass-card" data-aos="flip-down">
+                <h2>Il Potere del Banburismus</h2>
+                <p>Questa tecnica statistica era l'unico modo per battere Enigma prima che i rotori venissero cambiati. Joan eccelleva nel calcolare la probabilità che due sequenze di lettere appartenessero allo stesso rotore.</p>
+                
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <h4>-78%</h4>
+                        <p>Riduzione delle perdite navali nel 1941</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>1.0M</h4>
+                        <p>Messaggi decodificati sotto la sua supervisione</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>MBE</h4>
+                        <p>Membro dell'Ordine dell'Impero Britannico</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container" style="text-align: center;">
+            <h2 data-aos="fade-down">L'Eredità Culturale</h2>
+            <p style="max-width: 800px; margin: 40px auto;" data-aos="fade-up">Oggi Joan Clarke è celebrata non solo come una mente eccelsa, ma come un'icona della parità di genere nelle discipline STEM. La sua storia, portata sullo schermo da Keira Knightley in <em>The Imitation Game</em>, continua a ispirare generazioni di scienziate.</p>
+            <div class="image-frame" style="display: inline-block; margin-top: 50px;" data-aos="zoom-in">
+                 <p style="padding: 20px; font-style: italic;">"La targa blu a West Dulwich commemora il suo ruolo pionieristico."</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-logo">JOAN CLARKE</div>
+            <p>1917 — 1996</p>
+            <p style="opacity: 0.4; font-size: 0.8rem; margin-top: 20px;">Un omaggio alla crittanalisi britannica. Riservato alla storia.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Inizializza Animazioni
+        AOS.init({ duration: 1000, once: false });
+
+        // Loader Effetto "Decrittazione"
+        const loaderText = document.getElementById('loader-text');
+        const chars = "010101011101010101";
+        setInterval(() => {
+            let res = "";
+            for(let i=0; i<18; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            loaderText.innerText = res;
+        }, 100);
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+            }, 2000);
+        });
+
+        // Background Matrix Effect
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(5, 7, 10, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#c5a059";
+            ctx.font = fontSize + "px JetBrains Mono";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
